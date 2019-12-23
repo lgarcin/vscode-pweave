@@ -5,126 +5,69 @@ import cp = require('child_process');
 import path = require('path');
 import os = require('os');
 
-var channel = null;
-
 const fullRange = (doc: vscode.TextDocument) => doc.validateRange(new vscode.Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE));
 
-export class OperatingSystem {
-	public name: string;
-	public file_ext: string;
-	public checker: string;
-	constructor(name: string, file_ext: string, checker: string) {
-		this.name = name;
-		this.file_ext = file_ext;
-		this.checker = checker;
-	}
-}
-const windows: OperatingSystem = new OperatingSystem('win32', '.exe', 'where');
-const linux: OperatingSystem = new OperatingSystem('linux', '.pl', 'which');
-const mac: OperatingSystem = new OperatingSystem('darwin', '.pl', 'which');
+function getCommand(cmd: string): Promise<string> {
+	const configuration = vscode.workspace.getConfiguration('vscode-pweave');
+	const command = <string>configuration.get(cmd + 'Path');
+	return new Promise((resolve, reject) => {
+		if (command === null || command === undefined) {
+			reject(new Error(cmd + ' not defined in config'));
+		} else {
+			let checkCommand: string = "";
+			switch (os.platform()) {
+				case "win32": checkCommand = 'where ' + command;
+					break;
+				case "linux":
+				case "darwin":
+					checkCommand = 'which ' + command;
 
-export class LaTexFormatter {
-	private machine_os: string;
-	private current_os!: OperatingSystem;
-	private formatter: string;
-	constructor() {
-		this.machine_os = os.platform();
-		console.log(this.machine_os);
-		this.formatter = 'latexindent';
-	}
-	public formatDocument(document: vscode.TextDocument): Thenable<vscode.TextEdit[]> {
-		return new Promise((resolve, reject) => {
-			let formatter = 'latexindent';
-			let filename = document.fileName;
-
-			if (this.machine_os === windows.name) {
-				this.current_os = windows;
-			} else if (this.machine_os === linux.name) {
-				this.current_os = linux;
-			} else if (this.machine_os === mac.name) {
-				this.current_os = mac;
 			}
-
-			this.checkPath(this.current_os.checker).then((res) => {
-				if (!res) {
-					showErrorMessage('Can not find latexindent in PATH!');
-					return reject(new Error('Can not find latexindent in PATH!'));
+			cp.exec(checkCommand, (error, stdout, stderr) => {
+				if (stdout !== "") {
+					resolve(command);
 				}
-				this.format(filename, document).then((res) => {
-					return resolve(res);
-				});
-
-			});
-		});
-	}
-	private checkPath(checker: string): Thenable<boolean> {
-		return new Promise((resolve, reject) => {
-			cp.exec(checker + ' ' + this.formatter, (err, stdout, stderr) => {
-				if (stdout === '') {
-					this.formatter += this.current_os.file_ext;
-					this.checkPath(checker).then((res) => {
-						if (res) { resolve(true); }
-						else { resolve(false); }
-					});
+				else {
+					reject(new Error(cmd + ' not defined in path'));
 				}
-				resolve(true);
 			});
-		});
-	}
-	private format(filename: string, document: vscode.TextDocument): Thenable<vscode.TextEdit[]> {
-		return new Promise((resolve, reject) => {
-			cp.exec(this.formatter + ' "' + filename + '"', (err, stdout, stderr) => {
-				if (stdout !== '') {
-					var edit = [vscode.TextEdit.replace(fullRange(document), stdout)];
-					return resolve(edit);
-				}
-				return reject(new Error('Empty output'));
-			});
-		});
-
-	}
-}
-
-function showErrorMessage(msg: string) {
-	vscode.window.showErrorMessage(msg);
-}
-
-class LaTexDocumentRangeFormatter implements vscode.DocumentFormattingEditProvider {
-	private formatter: LaTexFormatter;
-
-	constructor() {
-		this.formatter = new LaTexFormatter();
-	}
-	public async provideDocumentFormattingEdits(
-		document: vscode.TextDocument,
-		options: vscode.FormattingOptions, token: vscode.CancellationToken): Promise<vscode.TextEdit[]> {
-		await document.save();
-		return this.formatter.formatDocument(document);
-	}
+		}
+	});
 }
 
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.languages.registerDocumentFormattingEditProvider('pweave_tex', {
-			provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-				let fullText = document.getText();
-				let toto = fullText.replace(/(<<.*?>>=)(.*?)(@)/gms, (_, openingTag, code, closingTag) => {
-					let a = cp.execSync('autopep8 -', {
+			async provideDocumentFormattingEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
+				const fullText = document.getText();
+				const autopep8Command = await getCommand('autopep8');
+				let nowebReplace = fullText.replace(/(<<.*?>>=)(.*?)(@)/gms, (_, openingTag, code, closingTag) => {
+					let formattedPython = cp.execSync(autopep8Command + ' -', {
 						input: code
-					});
-					return "\\begin{noweb}\n" + openingTag + a + closingTag + "\n\\end{noweb}";
+					}).toString();
+					return "\\begin{noweb}\n" + openingTag + formattedPython + closingTag + "\n\\end{noweb}";
 				});
-				let titi = cp.execSync('latexindent -y="verbatimEnvironments:noweb:1', {
-					input: toto
+				console.log(nowebReplace);
+				const latexindentCommand = await getCommand('latexindent');
+				let indentedDocument = cp.execSync(latexindentCommand + ' -y="verbatimEnvironments:noweb:1', {
+					input: nowebReplace
 				}).toString();
-				let tutu = titi.toString().replace(/\h*\\begin{noweb}\h*|\h*\\end{noweb}\h*/g, "");
-				return [vscode.TextEdit.replace(fullRange(document), tutu)];
+				console.log('----------------------------------------');
+				console.log(indentedDocument);
+				let finalDocument = indentedDocument.replace(/^\s*\\begin{noweb}.*?(<<.*?>>=.*?@).*?\\end{noweb}\h*$/gms, (_, code) => code);
+				return [vscode.TextEdit.replace(fullRange(document), finalDocument)];
 			}
 		}));
 	context.subscriptions.push(
-		vscode.commands.registerCommand('vscode-pweave.build', () => {
-			console.log('toto');
+		vscode.commands.registerCommand('vscode-pweave.build', async () => {
+			if (vscode.window.activeTextEditor) {
+				const currentDocument = vscode.window.activeTextEditor.document;
+				const file = currentDocument.uri.fsPath;
+				const outFile = path.join(path.dirname(file), path.basename(file, path.extname(file)) + '.tex');
+				const command = await getCommand('pweave');
+				cp.exec(command + ' ' + currentDocument.uri.fsPath + ' -f texminted -o ' + outFile);
+			}
 		})
 	);
 }

@@ -14,9 +14,32 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": [
+			{
+				"title": "vscode-pweave",
+				"properties": {
+					"vscode-pweave.latexindentPath": {
+						"type": "string",
+						"default": "latexindent",
+						"description": "latexindent path"
+					},
+					"vscode-pweave.autopep8Path": {
+						"type": "string",
+						"default": "autopep8",
+						"description": "autopep8 path"
+					},
+					"vscode-pweave.pweavePath": {
+						"type": "string",
+						"default": "pweave",
+						"description": "pweave path"
+					}
+				}
+			}
+		],
 		"keybindings": {
 			"command": "vscode-pweave.build",
-			"key": "ctrl+alt+b"
+			"key": "ctrl+alt+b",
+			"when": "editorLangId == pweave_tex"
 		},
 		"languages": [
 			{
@@ -33,7 +56,8 @@
 		"commands": [
 			{
 				"command": "vscode-pweave.build",
-				"title": "Build pweave"
+				"title": "Build pweave",
+				"when": "editorLangId == pweave_tex"
 			}
 		]
 	},
@@ -43,9 +67,6 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
-	},
-	"dependencies": {
-		"@dicy/core": "0.15.2"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
