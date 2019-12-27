@@ -3,37 +3,10 @@
 import * as vscode from 'vscode';
 import cp = require('child_process');
 import path = require('path');
-import os = require('os');
+import { parse } from './magic_comments';
+import { getCommand } from './command_line';
 
 const fullRange = (doc: vscode.TextDocument) => doc.validateRange(new vscode.Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE));
-
-function getCommand(cmd: string): Promise<string> {
-	const configuration = vscode.workspace.getConfiguration('vscode-pweave');
-	const command = <string>configuration.get(cmd + 'Path');
-	return new Promise((resolve, reject) => {
-		if (command === null || command === undefined) {
-			reject(new Error(cmd + ' not defined in config'));
-		} else {
-			let checkCommand: string = "";
-			switch (os.platform()) {
-				case "win32": checkCommand = 'where ' + command;
-					break;
-				case "linux":
-				case "darwin":
-					checkCommand = 'which ' + command;
-
-			}
-			cp.exec(checkCommand, (error, stdout, stderr) => {
-				if (stdout !== "") {
-					resolve(command);
-				}
-				else {
-					reject(new Error(cmd + ' not defined in path'));
-				}
-			});
-		}
-	});
-}
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -59,14 +32,23 @@ export function activate(context: vscode.ExtensionContext) {
 				return [vscode.TextEdit.replace(fullRange(document), finalDocument)];
 			}
 		}));
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('vscode-pweave.build', async () => {
 			if (vscode.window.activeTextEditor) {
 				const currentDocument = vscode.window.activeTextEditor.document;
 				const file = currentDocument.uri.fsPath;
 				const outFile = path.join(path.dirname(file), path.basename(file, path.extname(file)) + '.tex');
-				const command = await getCommand('pweave');
-				cp.exec(command + ' ' + currentDocument.uri.fsPath + ' -f texminted -o ' + outFile);
+				const pweaveCommand = await getCommand('pweave');
+				const magic_comments = parse(currentDocument.getText());
+				const pweaveOutputFormat = magic_comments.get('pweaveOutputFormat');
+				console.log(pweaveOutputFormat);
+				let texOuputFormat = "";
+				if (pweaveOutputFormat !== undefined && ['tex', 'texminted', 'texpygments'].some(x => x === pweaveOutputFormat)) {
+					texOuputFormat = ' -f ' + pweaveOutputFormat;
+				}
+				console.log(pweaveCommand + ' ' + currentDocument.uri.fsPath + texOuputFormat + ' -o ' + outFile);
+				cp.exec(pweaveCommand + ' ' + currentDocument.uri.fsPath + texOuputFormat + ' -o ' + outFile);
 			}
 		})
 	);
