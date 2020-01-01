@@ -1,4 +1,5 @@
 {
+	"publisher": "lgarcin",
 	"name": "vscode-pweave",
 	"displayName": "vscode-pweave",
 	"description": "Format pweave documents",
@@ -32,6 +33,11 @@
 						"type": "string",
 						"default": "pweave",
 						"description": "pweave path"
+					},
+					"vscode-pweave.pweaveOutputFormat": {
+						"type": "string",
+						"default": "tex",
+						"description": "Pweave output format : 'tex' or 'texminted' or 'texpygments'"
 					}
 				}
 			}
@@ -71,7 +77,7 @@
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^5.2.7",
-		"@types/node": "^12.12.21",
+		"@types/node": "^13.1.2",
 		"@types/vscode": "^1.41.0",
 		"glob": "^7.1.6",
 		"mocha": "^6.2.2",

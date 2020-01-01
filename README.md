@@ -1,65 +1,90 @@
 # vscode-pweave README
 
-This is the README for your extension "vscode-pweave". After writing up a brief description, we recommend including the following sections.
+This extension gives support for [Pweave](http://mpastell.com/pweave/docs.html) files, namely formatting and building.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+For the moment, this extension only supports LaTeX Pweave files using **noweb** syntax.
 
-For example if there is an image subfolder under your extension project workspace:
+*Example*
 
-\!\[feature X\]\(images/feature-x.png\)
+```latex
+\documentclass{article}
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+\begin{document}
+
+This functions calculates the gcd of two integers.
+
+<<>>=
+def gcd(a, b):
+    while b!=0:
+        a, b = b, a % b
+    return a
+@
+
+\end{document}
+
+```
+
+### Formatting
+
+Formatting is achieved with <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>. It uses `autopep8` for python formatting and `latexindent` for LaTeX formatting.
+
+### Building
+
+Building is achieved with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>B</kbd>. It generates a LaTeX file. By default, Python code is rendered with `verbatim` environments. This behaviour can be changed by modifying the `pweaveOutputFormat` variable in the extension settings. Accepted values are `tex`, `texminted` and `texpygments` (cf. [Output Formats](http://mpastell.com/pweave/formats.html) in Pweave documentation).
+
+One can also changes the defaut behaviour by adding a *magic comment* in the Pweave LaTeX file.
+
+```latex
+%!TeX pweaveOutputFormat=tex
+```
+
+```latex
+%!TeX pweaveOutputFormat=texminted
+```
+
+```latex
+%!TeX pweaveOutputFormat=texpygments
+```
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+* `autopep8`
+
+This can be installed via `pip`.
+
+```cmd
+pip install autopep8
+```
+
+* `latexindent`
+
+This executable is usually included in common LaTeX distributions butcan also be downloaded from https://ctan.org/pkg/latexindent.
+
+* `pweave`
+
+This can be installed via `pip`.
+
+```cmd
+pip install pweave
+```
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `vscode-pweave.autopep8Path`: path of the `autopep8` executable. Defaults to `autopep8`.
+* `vscode-pweave.latexindentPath`: path of the `latexindent` executable. Defaults to `latexindent`.
+* `vscode-pweave.pweavePath`: path of the `pweave` executable. Defaults to `pweave`.
+* `vscode-pweave.pweaveOutputFormat` : Pweave output format : `'tex'` or `'texminted'` or `'texpygments'`.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+This extension does not yet provide autocompletion. This is on the todo list.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release.
