@@ -1,5 +1,9 @@
 {
 	"publisher": "lgarcin",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lgarcin/vscode-pweave.git"
+	},
 	"name": "vscode-pweave",
 	"displayName": "vscode-pweave",
 	"description": "Format pweave documents",
