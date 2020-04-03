@@ -28,11 +28,11 @@ def gcd(a, b):
 
 ### Formatting
 
-Formatting is achieved with <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>. It uses `autopep8` for python formatting and `latexindent` for LaTeX formatting.
+Formatting is achieved with <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>f</kbd>. It uses `autopep8` for python formatting and `latexindent` for LaTeX formatting.
 
 ### Building
 
-Building is achieved with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>B</kbd>. It generates a LaTeX file. By default, Python code is rendered with `verbatim` environments. This behaviour can be changed by modifying the `pweaveOutputFormat` variable in the extension settings. Accepted values are `tex`, `texminted` and `texpygments` (cf. [Output Formats](http://mpastell.com/pweave/formats.html) in Pweave documentation).
+Building is achieved with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>b</kbd>. It generates a LaTeX file. By default, Python code is rendered with `verbatim` environments. This behaviour can be changed by modifying the `pweaveOutputFormat` variable in the extension settings. Accepted values are `tex`, `texminted` and `texpygments` (cf. [Output Formats](http://mpastell.com/pweave/formats.html) in Pweave documentation).
 
 One can also changes the defaut behaviour by adding a *magic comment* in the Pweave LaTeX file.
 
@@ -47,6 +47,10 @@ One can also changes the defaut behaviour by adding a *magic comment* in the Pwe
 ```latex
 %!TeX pweaveOutputFormat=texpygments
 ```
+
+### Showing
+
+<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>b</kbd> displays the generated LaTeX file in a pane beside the active editor.
 
 ## Requirements
 
