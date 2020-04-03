@@ -86,9 +86,3 @@ This extension contributes the following settings:
 ## Known Issues
 
 This extension does not yet provide autocompletion. This is on the todo list.
-
-## Release Notes
-
-### 0.0.1
-
-Initial release.
