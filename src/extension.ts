@@ -12,7 +12,6 @@ const OUTPUT_FORMATS = ['tex', 'texminted', 'texpygments'];
 const fullRange = (doc: vscode.TextDocument) => doc.validateRange(new vscode.Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE));
 
 export function activate(context: vscode.ExtensionContext) {
-
 	context.subscriptions.push(
 		vscode.languages.registerDocumentFormattingEditProvider('pweave_tex', {
 			async provideDocumentFormattingEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
@@ -34,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}));
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('vscode-pweave.build', async () => {
+		vscode.commands.registerTextEditorCommand('vscode-pweave.build', async () => {
 			if (vscode.window.activeTextEditor) {
 				const currentDocument = vscode.window.activeTextEditor.document;
 				const file = currentDocument.uri.fsPath;
@@ -50,6 +49,21 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
+
+	context.subscriptions.push(
+		vscode.commands.registerTextEditorCommand('vscode-pweave.show', async () => {
+			if (vscode.window.activeTextEditor) {
+				const currentDocument = vscode.window.activeTextEditor.document;
+				const file = currentDocument.uri.fsPath;
+				const outFile = path.join(path.dirname(file), path.basename(file, path.extname(file)) + '.tex');
+				vscode.window.showTextDocument(vscode.Uri.file(outFile), {
+					viewColumn: vscode.ViewColumn.Beside
+				});
+			}
+		})
+	);
 }
+
+// TODO Add command to open tex file
 
 export function deactivate() { }

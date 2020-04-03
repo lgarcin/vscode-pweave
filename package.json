@@ -46,11 +46,18 @@
 				}
 			}
 		],
-		"keybindings": {
-			"command": "vscode-pweave.build",
-			"key": "ctrl+alt+b",
-			"when": "editorLangId == pweave_tex"
-		},
+		"keybindings": [
+			{
+				"command": "vscode-pweave.build",
+				"key": "ctrl+alt+b",
+				"when": "editorLangId == pweave_tex"
+			},
+			{
+				"command": "vscode-pweave.show",
+				"key": "ctrl+alt+v",
+				"when": "editorLangId == pweave_tex"
+			}
+		],
 		"languages": [
 			{
 				"id": "pweave_tex",
