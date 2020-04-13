@@ -17,7 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 			async provideDocumentFormattingEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
 				const fullText = document.getText();
 				const autopep8Command = await getCommand('autopep8');
-				let nowebReplace = fullText.replace(/(<<.*?>>=)(.*?)(@)/gms, (_, openingTag, code, closingTag) => {
+				// let nowebReplace = fullText.replace(/(<<.*?>>=)(.*?)(@)/gms, (_, openingTag, code, closingTag) => {
+				let nowebReplace = fullText.replace(/(<<[^<>]*>>=)(.*?)(@)/gms, (_, openingTag, code, closingTag) => {
 					let formattedPython = cp.execSync(autopep8Command + ' -', {
 						input: code
 					}).toString();
