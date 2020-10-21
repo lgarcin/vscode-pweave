@@ -46,7 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 				if (pweaveOutputFormat !== undefined && OUTPUT_FORMATS.includes(pweaveOutputFormat)) {
 					texOuputFormat = ' -f ' + pweaveOutputFormat;
 				}
-				cp.exec(pweaveCommand + ' ' + currentDocument.uri.fsPath + texOuputFormat + ' -o ' + outFile);
+				vscode.window.showInformationMessage("Building TeX file");
+				cp.exec(pweaveCommand + ' ' + currentDocument.uri.fsPath + texOuputFormat + ' -o ' + outFile, () => vscode.window.showInformationMessage("TeX file built"));
 			}
 		})
 	);
