@@ -50,7 +50,7 @@ One can also changes the defaut behaviour by adding a *magic comment* in the Pwe
 
 ### Showing
 
-<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>b</kbd> displays the generated LaTeX file in a pane beside the active editor.
+<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd> displays the generated LaTeX file in a pane beside the active editor.
 
 ## Requirements
 
