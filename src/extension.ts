@@ -12,6 +12,8 @@ const OUTPUT_FORMATS = ['tex', 'texminted', 'texpygments'];
 const fullRange = (doc: vscode.TextDocument) => doc.validateRange(new vscode.Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE));
 
 export function activate(context: vscode.ExtensionContext) {
+	const channel = vscode.window.createOutputChannel("vscode-pweave");
+
 	context.subscriptions.push(
 		vscode.languages.registerDocumentFormattingEditProvider('pweave_tex', {
 			async provideDocumentFormattingEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
@@ -48,6 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				vscode.window.showInformationMessage("vscode-pweave : building TeX file");
 				cp.exec(pweaveCommand + ' ' + currentDocument.uri.fsPath + texOuputFormat + ' -o ' + outFile, (error, stdout, stderr) => {
+					channel.appendLine(stdout);
+					channel.append(stderr);
 					if (error) {
 						vscode.window.showErrorMessage("vscode-pweave : an error ocurred while building TeX file");
 						return;
