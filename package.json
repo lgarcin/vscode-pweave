@@ -7,7 +7,7 @@
 	"name": "vscode-pweave",
 	"displayName": "vscode-pweave",
 	"description": "Format pweave documents",
-	"version": "0.3.4",
+	"version": "0.3.5",
 	"engines": {
 		"vscode": "^1.44.0"
 	},
