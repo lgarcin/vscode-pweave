@@ -9,7 +9,7 @@
 	"description": "Format pweave documents",
 	"version": "0.3.6",
 	"engines": {
-		"vscode": "^1.44.0"
+		"vscode": "^1.65.0"
 	},
 	"categories": [
 		"Other"
